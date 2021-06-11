@@ -31,6 +31,8 @@ SBUILD_CONF_DIR ?= "${SCHROOT_CONF}/${SBUILD_CHROOT}"
 SCHROOT_CONF_FILE ?= "${SCHROOT_CONF}/chroot.d/${SBUILD_CHROOT}"
 SCHROOT_CONF_FILE_RW ?= "${SCHROOT_CONF}/chroot.d/${SBUILD_CHROOT}-rw"
 
+SBUILD_CONFIG="${WORKDIR}/sbuild.conf"
+
 schroot_create_configs() {
     sudo -s <<'EOSUDO'
         set -e
@@ -96,7 +98,6 @@ EOSUDO
 }
 
 sbuild_export() {
-    SBUILD_CONFIG="${WORKDIR}/sbuild.conf"
     VAR=${1}; shift
     VAR_LINE="'${VAR}' => '${@}',"
     if [ -s "${SBUILD_CONFIG}" ]; then
@@ -106,7 +107,6 @@ sbuild_export() {
         echo "${VAR_LINE}" >> ${SBUILD_CONFIG}
         echo "};" >> ${SBUILD_CONFIG}
     fi
-    export SBUILD_CONFIG="${SBUILD_CONFIG}"
 }
 
 schroot_install() {
