@@ -55,6 +55,10 @@ dpkg_runbuild() {
             echo '$apt_keep_downloaded_packages = 1;' >> ${SCHROOT_USER_HOME}/.sbuildrc
     ) 9>"${TMPDIR}/sbuildrc.lock"
 
+    if [ ${USE_CCACHE} -eq 1 ]; then
+        schroot_configure_ccache
+    fi
+
     profiles=$(grep "DEB_BUILD_PROFILES" ${SBUILD_CONFIG} | tail -n1 | cut -d "'" -f 4)
     if [ ${ISAR_CROSS_COMPILE} -eq 1 ]; then
         profiles="${profiles} cross nocheck"
