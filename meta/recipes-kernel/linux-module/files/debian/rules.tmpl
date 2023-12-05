@@ -45,11 +45,14 @@ KERNEL_DEP := $(shell dpkg-query -W -f '$${Depends}' ${KERNEL_HEADERS_PKG} | sed
 KDIR := $(shell dpkg -L $(KERNEL_DEP) | grep "/lib/modules/.*/build")
 endif
 
+KCFLAGS := "-fdebug-prefix-map=$(PWD)=."
+KAFLAGS := "-fdebug-prefix-map=$(PWD)=."
+
 override_dh_auto_clean:
 	$(MAKE) -C $(KDIR) M=$(PWD) clean
 
 override_dh_auto_build:
-	$(MAKE) -C $(KDIR) M=$(PWD) $(PARALLEL_MAKE) modules
+	$(MAKE) -C $(KDIR) M=$(PWD) $(PARALLEL_MAKE) KCFLAGS="$(KCFLAGS)" KAFLAGS="$(KAFLAGS)" modules
 ifneq ($(filter pkg.sign,$(DEB_BUILD_PROFILES)),)
 	find . -name "*.ko" -print -exec $(KDIR)/scripts/sign-file ${SIGNATURE_HASHFN} ${SIGNATURE_KEYFILE} ${SIGNATURE_CERTFILE} {} \;
 endif
