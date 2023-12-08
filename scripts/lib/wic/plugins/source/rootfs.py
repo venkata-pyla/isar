@@ -218,6 +218,18 @@ class RootfsPlugin(SourcePlugin):
                     rm_cmd = "rm -rf %s" % (full_path)
                     exec_native_cmd(rm_cmd, native_sysroot, pseudo)
 
+                # After the path is excluded from rootfs, the parent directory
+                # of the path is modified to current build time, for reproducible
+                # set this modified time to SOURCE_DATE_EPOCH
+                if os.getenv('SOURCE_DATE_EPOCH'):
+                    sde_time = int(os.getenv('SOURCE_DATE_EPOCH'))
+                    if path.endswith(os.sep):
+                        touch_cmd = "touch %s -h -d@%s" %(full_path, sde_time)
+                    else:
+                        parent_dir = os.path.dirname(full_path)
+                        touch_cmd = "touch %s -h -d@%s" %(parent_dir, sde_time)
+                    exec_native_cmd(touch_cmd, native_sysroot, pseudo)
+
             # Update part.has_fstab here as fstab may have been added or
             # removed by the above modifications.
             part.has_fstab = os.path.exists(os.path.join(new_rootfs, "etc/fstab"))
