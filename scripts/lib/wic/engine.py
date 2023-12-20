@@ -456,6 +456,7 @@ class Disk:
         else:
             # copy first sectors that may contain bootloader
             sparse_copy(self.imagepath, target, length=2048 * self._lsector_size)
+            logger.info("imagepath: {} target {}".format(self.imagepath, target))
 
             # copy source partition table to the target
             parts = read_ptable(self.imagepath)
